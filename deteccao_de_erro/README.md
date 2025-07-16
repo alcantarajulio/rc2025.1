@@ -202,7 +202,7 @@ print(f"CRC Calculado: {crc_calculado}")
 # Quadro T(x) a ser transmitido: dados_teste + crc_calculado
 ```
 
->‼️**Importante**‼️ : Entende as operações realizadas com base nos livros e e complete o codigo coompremdendo o conceito.
+>‼️**Importante**‼️ : Entende as operações realizadas com base nos livros e e complete o codigo compreendendo o conceito.
 
 ## Parte 3: Análise Comparativa de Desempenho
 
