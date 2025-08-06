@@ -409,17 +409,19 @@ O que cada item deve conter:
 
 No dia __/08/2025 deverão ser entregues todos os arquivos no formulário do Google Classroom:  
 https://classroom.google.com/  
-  
-- [ ] Parte 1 – Questão 1:  
+
+**Parte 1**
+- [ ] Entregavel 1:  
   - `.pcap` (captura Wireshark)  
   - PDF de evidências (tabelas de roteamento e POST/JSON)  
-- [ ] Parte 1 – Questão 2:  
+- [ ] Entregavel 2:  
   - `.pcap` (≤ 1 MB)  
-  - PDF de análise (contagem ao infinito e técnicas de mitigação)  
-- [ ] Parte 2 – `zip` com o cenário de 12 roteadores:  
+  - PDF com a esplicação dacontagem ao infinito e técnicas de mitigação
+- [ ] Entregavel 3 – `zip` com o cenário de 12 roteadores:  
   - `architecture.png`  
   - `topologia.json`  
   - `R1.csv` … `R12.csv`  
   - `captura.pcap`
 
+**Parte 2**
 Laboratorio no dia __/08/2025
