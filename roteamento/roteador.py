@@ -49,7 +49,7 @@ class Router:
 
         self.routing_table[self.my_network] = {
             "cost": 0,
-            "next_hop": self.my_address
+            "next_hop": self.my_network
         }
 
         for neighbor_addr, link_cost in self.neighbors.items():
