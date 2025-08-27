@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import csv
 import json
 import threading
@@ -103,6 +101,9 @@ class Router:
                     self.routing_table[network]["cost"] = new_cost
                     self.routing_table[network]["next_hop"] = sender_address
                     changed = True
+        if changed:
+            self.send_updates_to_neighbors()
+
 
         return changed
 
@@ -135,8 +136,7 @@ class Router:
         # 2. IMPLEMENTE A LÓGICA DE SUMARIZAÇÃO nesta cópia.
         # 3. ENVIE A CÓPIA SUMARIZADA no payload, em vez da tabela original.
         
-        tabela_para_enviar = self.routing_table # ATENÇÃO: Substitua pela cópia sumarizada.
-
+        tabela_para_enviar = self.routing_table
         payload = {
             "sender_address": self.my_address,
             "routing_table": tabela_para_enviar
@@ -186,7 +186,7 @@ def receive_update():
         return jsonify({"error": "Missing sender_address or routing_table"}), 400
 
     print(f"Recebida atualização de {sender_address}:")
-    print(json.dumps(sender_table, indent=4))
+    # print(json.dumps(sender_table, indent=4))
 
     changed = router_instance.process_update(sender_address, sender_table)
 

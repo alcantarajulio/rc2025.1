@@ -382,7 +382,7 @@ O que cada item deve conter:
   - Nome no formato `R<N>.csv` (ex: `R3.csv`)
   - Conteúdo: lista de vizinhos e custos
     ```
-    neighbor_address,cost
+    vizinho,custo
     192.168.0.1:5000,1
     192.168.0.2:5000,2
     ```
