@@ -1,0 +1,11 @@
+Inicia os roteadores:
+./start_routers_tmux.sh
+
+Anexa na session do tmux:
+tmux attach-session -t routers
+
+Alternar entre terminais:
+Ctrl+B (n for next) (p for previous)
+
+Encerra todos os roteadores:
+tmux kill-session -t routers

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import csv
 import json
 import threading
@@ -29,21 +27,6 @@ class Router:
         self.neighbors = neighbors
         self.my_network = my_network
         self.update_interval = update_interval
-
-        # TODO: Este é o local para criar e inicializar sua tabela de roteamento.
-        #
-        # 1. Crie a estrutura de dados para a tabela de roteamento. Um dicionário é
-        #    uma ótima escolha, onde as chaves são as redes de destino (ex: '10.0.1.0/24')
-        #    e os valores são outro dicionário contendo 'cost' e 'next_hop'.
-        #    Ex: {'10.0.1.0/24': {'cost': 0, 'next_hop': '10.0.1.0/24'}}
-        #
-        # 2. Adicione a rota para a rede que este roteador administra diretamente
-        #    (a rede em 'self.my_network'). O custo para uma rede diretamente
-        #    conectada é 0, e o 'next_hop' pode ser a própria rede ou o endereço do roteador.
-        #
-        # 3. Adicione as rotas para seus vizinhos diretos, usando o dicionário
-        #    'self.neighbors'. Para cada vizinho, o 'cost' é o custo do link direto
-        #    e o 'next_hop' é o endereço do próprio vizinho.
         
         self.routing_table = {}
 
@@ -103,7 +86,8 @@ class Router:
                     self.routing_table[network]["cost"] = new_cost
                     self.routing_table[network]["next_hop"] = sender_address
                     changed = True
-
+        if changed:
+            self.send_updates_to_neighbors()
         return changed
 
     def _start_periodic_updates(self):
@@ -135,8 +119,7 @@ class Router:
         # 2. IMPLEMENTE A LÓGICA DE SUMARIZAÇÃO nesta cópia.
         # 3. ENVIE A CÓPIA SUMARIZADA no payload, em vez da tabela original.
         
-        tabela_para_enviar = self.routing_table # ATENÇÃO: Substitua pela cópia sumarizada.
-
+        tabela_para_enviar = self.routing_table
         payload = {
             "sender_address": self.my_address,
             "routing_table": tabela_para_enviar
@@ -158,17 +141,14 @@ router_instance = None
 @app.route('/routes', methods=['GET'])
 def get_routes():
     """Endpoint para visualizar a tabela de roteamento atual."""
-    # TODO: Aluno! Este endpoint está parcialmente implementado para ajudar na depuração.
-    # Você pode mantê-lo como está ou customizá-lo se desejar.
-    # - mantenha o routing_table como parte da resposta JSON.
+
     if router_instance:
         return jsonify({
-            "message": "Não implementado!.",
             "vizinhos" : router_instance.neighbors,
             "my_network": router_instance.my_network,
             "my_address": router_instance.my_address,
             "update_interval": router_instance.update_interval,
-            "routing_table": router_instance.routing_table # Exibe a tabela de roteamento atual (a ser implementada)
+            "routing_table": router_instance.routing_table 
         })
     return jsonify({"error": "Roteador não inicializado"}), 500
 
