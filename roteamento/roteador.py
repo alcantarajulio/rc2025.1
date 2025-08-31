@@ -14,97 +14,40 @@ class Router:
     Representa um roteador que executa o algoritmo de Vetor de Distância.
     """
 
+class Router:
+    """
+    Representa um roteador que executa o algoritmo de Vetor de Distância.
+    """
+
+class Router:
+    """
+    Representa um roteador que executa o algoritmo de Vetor de Distância.
+    """
+
     def __init__(self, my_address, neighbors, my_network, update_interval=1):
         """
         Inicializa o roteador.
-
-        :param my_address: O endereço (ip:porta) deste roteador.
-        :param neighbors: Um dicionário contendo os vizinhos diretos e o custo do link.
-                          Ex: {'127.0.0.1:5001': 5, '127.0.0.1:5002': 10}
-        :param my_network: A rede que este roteador administra diretamente.
-                           Ex: '10.0.1.0/24'
-        :param update_interval: O intervalo em segundos para enviar atualizações, o tempo que o roteador espera 
-                                antes de enviar atualizações para os vizinhos.        """
+        """
+        # ⚠️ ALTERAÇÃO: Certifique-se de receber TODOS os parâmetros
         self.my_address = my_address
         self.neighbors = neighbors
         self.my_network = my_network
         self.update_interval = update_interval
 
-        # TODO: Este é o local para criar e inicializar sua tabela de roteamento.
-        #
-        # 1. Crie a estrutura de dados para a tabela de roteamento. Um dicionário é
-        #    uma ótima escolha, onde as chaves são as redes de destino (ex: '10.0.1.0/24')
-        #    e os valores são outro dicionário contendo 'cost' e 'next_hop'.
-        #    Ex: {'10.0.1.0/24': {'cost': 0, 'next_hop': '10.0.1.0/24'}}
-        #
-        # 2. Adicione a rota para a rede que este roteador administra diretamente
-        #    (a rede em 'self.my_network'). O custo para uma rede diretamente
-        #    conectada é 0, e o 'next_hop' pode ser a própria rede ou o endereço do roteador.
-        #
-        # 3. Adicione as rotas para seus vizinhos diretos, usando o dicionário
-        #    'self.neighbors'. Para cada vizinho, o 'cost' é o custo do link direto
-        #    e o 'next_hop' é o endereço do próprio vizinho.
-        
+        # Inicializa a tabela de roteamento
         self.routing_table = {}
-
+        
+        # Adiciona apenas a rede local com custo 0
         self.routing_table[self.my_network] = {
             "cost": 0,
             "next_hop": self.my_network
         }
-
-        for neighbor_addr, link_cost in self.neighbors.items():
-            if neighbor_addr not in self.routing_table or link_cost < self.routing_table[neighbor_addr]['cost']:
-                self.routing_table[neighbor_addr] = {
-                    "cost": link_cost,
-                    "next_hop": neighbor_addr
-                }
+        
         print("Tabela de roteamento inicial:")
         print(json.dumps(self.routing_table, indent=4))
-
-        # Inicia o processo de atualização periódica em uma thread separada
+        
+        # Inicia o processo de atualização periódica
         self._start_periodic_updates()
-
-    def process_update(self, sender_address, sender_table):
-        """
-        Aplica Bellman-Ford usando a tabela recebida de um vizinho 
-        return: true se a tabela mudou
-        """
-        if sender_address not in self.neighbors:
-            print(f"Ignorando update de non-neighbors {sender_address}")
-            return False
-
-        link_cost = self.neighbors[sender_address]
-        changed = False
-
-        for network, info in sender_table.items():
-            neighbor_report_cost = info.get("cost", float('inf'))
-            new_cost = link_cost + neighbor_report_cost
-
-            # evita criar rota com destino igual ao próprio endereço (loop)
-            if network == self.my_address:
-                continue
-
-            current_entry = self.routing_table.get(network)
-
-            if current_entry is None:
-                # nova rota
-                self.routing_table[network] = {
-                    "cost": new_cost,
-                    "next_hop": sender_address
-                }
-                changed = True
-                continue  
-
-            current_cost = current_entry["cost"]
-            current_next_hop = current_entry["next_hop"]
-
-            if new_cost < current_cost or current_next_hop == sender_address:
-                if new_cost != current_cost:
-                    self.routing_table[network]["cost"] = new_cost
-                    self.routing_table[network]["next_hop"] = sender_address
-                    changed = True
-
-        return changed
 
     def _start_periodic_updates(self):
         """Inicia uma thread para enviar atualizações periodicamente."""
@@ -120,36 +63,90 @@ class Router:
             try:
                 self.send_updates_to_neighbors()
             except Exception as e:
-                print(f"Erro durante a atualização periódida: {e}")
+                print(f"Erro durante a atualização periódica: {e}")
 
     def send_updates_to_neighbors(self):
         """
-        Envia a tabela de roteamento (potencialmente sumarizada) para todos os vizinhos.
+        Envia a tabela de roteamento para todos os vizinhos.
         """
-        # TODO: O código abaixo envia a tabela de roteamento *diretamente*.
-        #
-        # ESTE TRECHO DEVE SER CHAMAADO APOS A SUMARIZAÇÃO.
-        #
-        # dica:
-        # 1. CRIE UMA CÓPIA da `self.routing_table` NÃO ALTERE ESTA VALOR.
-        # 2. IMPLEMENTE A LÓGICA DE SUMARIZAÇÃO nesta cópia.
-        # 3. ENVIE A CÓPIA SUMARIZADA no payload, em vez da tabela original.
+        # ⚠️ ALTERAÇÃO: Reduza o sleep para 0.5 segundos ou remova completamente
+        time.sleep(0.5)  # Apenas 0.5 segundos agora
         
-        tabela_para_enviar = self.routing_table # ATENÇÃO: Substitua pela cópia sumarizada.
-
         payload = {
             "sender_address": self.my_address,
-            "routing_table": tabela_para_enviar
+            "routing_table": self.routing_table
         }
 
         for neighbor_address in self.neighbors:
             url = f'http://{neighbor_address}/receive_update'
             try:
                 print(f"Enviando tabela para {neighbor_address}")
-                requests.post(url, json=payload, timeout=5)
+                requests.post(url, json=payload, timeout=2)  # Timeout reduzido
             except requests.exceptions.RequestException as e:
                 print(f"Não foi possível conectar ao vizinho {neighbor_address}. Erro: {e}")
+                
+    def process_update(self, sender_address, sender_table):
+        """
+        Aplica Bellman-Ford com detecção de rotas quebradas
+        """
+        if sender_address not in self.neighbors:
+            return False
 
+        link_cost = self.neighbors[sender_address]
+        changed = False
+
+        # ⚠️ ALTERAÇÃO CRÍTICA: Primeiro verifica se temos rotas quebradas
+        for network in list(self.routing_table.keys()):
+            if network != self.my_network:
+                current_entry = self.routing_table[network]
+                # Se o next hop for um vizinho que não responde, marca como quebrado
+                if current_entry["next_hop"] in self.neighbors:
+                    try:
+                        # Tenta pingar o next hop
+                        test_url = f'http://{current_entry["next_hop"]}/routes'
+                        response = requests.get(test_url, timeout=2)
+                        if response.status_code != 200:
+                            # Next hop está quebrado!
+                            print(f"🚨 Rota quebrada detectada para {network} via {current_entry['next_hop']}")
+                            self.routing_table[network]["cost"] = float('inf')
+                            changed = True
+                    except:
+                        # Next hop não responde - rota quebrada!
+                        print(f"🚨 Rota quebrada detectada para {network} via {current_entry['next_hop']}")
+                        self.routing_table[network]["cost"] = float('inf')
+                        changed = True
+
+        # Agora processa a atualização normal
+        for network, info in sender_table.items():
+            if network == self.my_network:
+                continue
+                
+            neighbor_report_cost = info.get("cost", float('inf'))
+            new_cost = link_cost + neighbor_report_cost
+
+            current_entry = self.routing_table.get(network)
+            
+            # Se não existe entrada ou a entrada atual está quebrada (custo infinito)
+            if current_entry is None or current_entry["cost"] == float('inf'):
+                self.routing_table[network] = {
+                    "cost": new_cost,
+                    "next_hop": sender_address
+                }
+                changed = True
+            # Se o próximo salto é o remetente, atualiza sempre
+            elif current_entry["next_hop"] == sender_address:
+                if new_cost != current_entry["cost"]:
+                    self.routing_table[network]["cost"] = new_cost
+                    changed = True
+            # Se encontrou caminho melhor
+            elif new_cost < current_entry["cost"]:
+                self.routing_table[network] = {
+                    "cost": new_cost,
+                    "next_hop": sender_address
+                }
+                changed = True
+
+        return changed
 # --- API Endpoints ---
 # Instância do Flask e do Roteador (serão inicializadas no main)
 app = Flask(__name__)
